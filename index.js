@@ -6,7 +6,7 @@ const ExpensesData = require("./Module/expensesModule");
 const mongoose = require("mongoose");
 const cors = require("cors");
 app.use(express.json());
-require("dotenv").config();
+// require("dotenv").config();
 mongoose.set("strictQuery", true);
 require("dns").lookup("www.google.com", function (err) {
   if (err) {
@@ -18,7 +18,6 @@ require("dns").lookup("www.google.com", function (err) {
 
 const port = process.env.port || 5500;
 
-///this is just test
 let jwt_token_key =
   "sndkjkvicxgiusdf9er73489djkfgvndfvhjfewur34t6r7e8hfnfdkjndfvd98fewipewfdsfsad0fdsfdsyf87ewrt38ryuhjbsd";
 
@@ -86,13 +85,13 @@ app.get("/addExpenses/:key", async (req, res) => {
 });
 
 app.get("/addExpenses", async (req, res) => {
-  let result = ExpensesData.find({}).sort({ expUploadedOnTime: -1 });
+  let result = await ExpensesData.find({}).sort({ expUploadedOnTime: -1 });
   res.send(result);
 });
 
 app.post("/dashBoard", async (req, res) => {
   const { userId } = req.body;
-  let result = ExpensesData.find({ userId: userId }).sort({
+  let result = await ExpensesData.find({ userId: userId }).sort({
     expUploadedOnTime: -1,
   });
   res.send(result);
@@ -113,7 +112,7 @@ app.post("/addNewExpenses/add", async (req, res) => {
 });
 
 app.delete("/addExpenses/:id", async (req, res) => {
-  let result = ExpensesData.findByIdAndDelete({ _id: req.params.id });
+  let result = await ExpensesData.findByIdAndDelete({ _id: req.params.id });
   res.send(result);
 });
 
@@ -126,7 +125,7 @@ app.patch("/approval/:id", async (req, res) => {
 app.post("/login", async (req, res) => {
   const { userEmail, password } = req.body;
   if (userEmail) {
-    let user = userData.findOne({ userEmail: userEmail });
+    let user = await userData.findOne({ userEmail: userEmail });
     if (await !user) {
       return res.status(404).json({ err: "User Not found" });
     }
@@ -164,7 +163,7 @@ app.post("/userDataProperty", async (req, res) => {
   if (userId === undefined) {
     return res.send({ data: "not Found" });
   } else {
-    let userProperty = userData.findOne({ _id: userId });
+    let userProperty = await userData.findOne({ _id: userId });
     userProperty.password = undefined;
     res.send(userProperty);
   }
@@ -173,7 +172,7 @@ app.post("/userDataProperty", async (req, res) => {
 app.post("/loggedUserData", async (req, res) => {
   const { token } = req.body;
   try {
-    if (token) {
+    if (await token) {
       const user = jwt.verify(token, jwt_token_key);
       res.send(user);
     }
@@ -184,7 +183,7 @@ app.post("/loggedUserData", async (req, res) => {
 
 app.patch("/updateUserProperty", async (req, res) => {
   const { _id } = req.body;
-  let user =  userData.findByIdAndUpdate(_id, req.body);
+  let user = await userData.findByIdAndUpdate(_id, req.body);
   res.send(user);
 });
 
