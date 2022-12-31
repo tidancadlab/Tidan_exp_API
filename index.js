@@ -6,7 +6,7 @@ const ExpensesData = require("./Module/expensesModule");
 const mongoose = require("mongoose");
 const cors = require("cors");
 app.use(express.json());
-require("dotenv").config();
+// require("dotenv").config();
 mongoose.set("strictQuery", true);
 require("dns").lookup("www.google.com", function (err) {
   if (err) {
