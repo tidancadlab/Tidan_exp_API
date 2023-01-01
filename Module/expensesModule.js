@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 
 const expensesData = new mongoose.Schema(
   {
-    expDate: { type: Date, require: true },
+    expDate: { type: Date, require: true, default: Date() },
     expItem: { type: String, require: true, lowercase: true },
     expVendor: { type: String, require: true, lowercase: true },
     expAmount: { type: Number, require: true },
     expRemark: { type: String, lowercase: true },
     expUploaded: { type: String, require: true, lowercase: true },
-    expApprovalStatus: { type: String, require: true, lowercase: true },
+    expApprovalStatus: { type: String, require: true, default: "pending" },
     expUploadedOnTime: { type: Date, default: Date() },
     userId: { type: String, require: true, Error: "Please Enter Data" },
     expComments: "",
