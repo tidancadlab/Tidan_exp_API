@@ -176,6 +176,7 @@ app.post("/loggedUserData", async (req, res) => {
     if (await token) {
       const user = jwt.verify(token, jwt_token_key);
       res.send(user);
+      console.log(user);
     }
   } catch (err) {
     console.log(err);
