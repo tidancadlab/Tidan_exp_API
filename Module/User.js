@@ -3,7 +3,13 @@ const mongoose = require("mongoose");
 const UserDetailsSchema = new mongoose.Schema(
   {
     userName: { type: String, require },
-    userEmail: { type: String, require: true, index:true, unique:true,sparse:true},
+    userEmail: {
+      type: String,
+      require: true,
+      index: true,
+      unique: true,
+      sparse: true,
+    },
     password: { type: String, require },
     userProperty: {
       userSex: { type: String, default: "not available" },
@@ -14,9 +20,14 @@ const UserDetailsSchema = new mongoose.Schema(
       projectName: { type: String, default: "not available" },
       profilePicture: { type: String, default: "not available" },
     },
+    paymentOpt: {
+      projects: { type: Array },
+      paymentHead: { type: Array },
+      paymentType: { type: Array },
+    },
     time: { type: Number, default: new Date().getTime() },
   },
-  
+
   {
     collection: "UserInfo",
   }

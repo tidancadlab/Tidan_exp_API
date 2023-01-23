@@ -6,7 +6,7 @@ const ExpensesData = require("./Module/expensesModule");
 const mongoose = require("mongoose");
 const cors = require("cors");
 app.use(express.json());
-require("dotenv").config(); 
+require("dotenv").config();
 mongoose.set("strictQuery", true);
 require("dns").lookup("www.google.com", function (err) {
   if (err) {
@@ -15,7 +15,6 @@ require("dns").lookup("www.google.com", function (err) {
     checkInternet(true);
   }
 });
-
 
 const port = process.env.port || 5500;
 
@@ -53,12 +52,12 @@ app.get("/search/:key", async (req, res) => {
   });
   res.send(data);
 });
-app.post("/", async (req, res) => {
+app.post("/registerUser", async (req, res) => {
   const { userEmail, userName, password } = req.body;
   if (!(userName && userEmail && password)) {
     res.send({ err: "Please enter all field" });
   } else {
-    const allUser = userData.findOne({ userEmail });
+    const allUser = await userData.findOne({ userEmail });
     if (!allUser) {
       let result = await userData.create({ userEmail, userName, password });
       res.send(result);
@@ -89,13 +88,14 @@ app.get("/addExpenses", async (req, res) => {
   let result = await ExpensesData.find({}).sort({ expUploadedOnTime: -1 });
   res.send(result);
 });
-
+let called = 0;
 app.post("/dashBoard", async (req, res) => {
   const { userId } = req.body;
   let result = await ExpensesData.find({ userId: userId }).sort({
     expUploadedOnTime: -1,
   });
-  res.send(result);
+  res.send({ code: false, data: result });
+  console.log(++called);
 });
 app.post("/viewExp", async (req, res) => {
   const { _id } = req.body;
@@ -103,7 +103,6 @@ app.post("/viewExp", async (req, res) => {
   if (!result) {
     return;
   }
-
   res.send(result);
 });
 
@@ -188,6 +187,54 @@ app.patch("/updateUserProperty", async (req, res) => {
   let user = await userData.findByIdAndUpdate(_id, req.body);
   res.send(user);
 });
+
+app.get("/allUser", async (req, res) => {
+  const user = await userData.find({}).sort({ userEmail: 1 });
+  if (user) {
+    let data = [];
+    for (const dataObj of user) {
+      data.push({
+        _id: dataObj._id,
+        userName: dataObj.userName,
+        paymentOpt: dataObj.paymentOpt,
+      });
+    }
+    res.send(data);
+  }
+});
+
+app.post("/approveExpenses", async (req, res) => {
+  const { reportingOfficer, userLevel } = req.body;
+  const data = await ExpensesData.find({ expApprovalStatus: "pending" });
+  const dF = data.filter((a) => {
+    return a.reportingOfficer
+      ? a.reportingOfficer === reportingOfficer
+      : a.userLevel < userLevel;
+  });
+  if (data) {
+    res.status(200).send(dF);
+  } else {
+    res.status(401).send({ msg: "data not found!" });
+  }
+});
+
+app.put("/updateOpt", async (req, res) => {
+  const data = req.body;
+  const { _id } = req.query;
+  const user = await userData.updateOne(
+    { _id },
+    { $push: { paymentOpt: data } }
+  );
+  res.send(user);
+  console.log(data);
+  res.sendStatus(200);
+});
+
+// app.get("/userTest", async (req, res) => {
+//   const { _id } = req.query;
+//   const user = await userData.findById({ _id });
+//   res.send(user);
+// });
 
 app.listen(port, () => {
   console.log(`server Running on ${port}`);
